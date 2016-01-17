@@ -17,6 +17,7 @@ from datetime import datetime
 import json
 import os
 import time
+import logging
 
 import endpoints
 from protorpc import messages
@@ -30,6 +31,8 @@ from models import Profile
 from models import ProfileMiniForm
 from models import ProfileForm
 from models import TeeShirtSize
+
+from utils import getUserId
 
 from settings import WEB_CLIENT_ID
 
@@ -67,21 +70,40 @@ class ConferenceApi(remote.Service):
         ## TODO 2
         ## step 1: make sure user is authed
         ## uncomment the following lines:
-        # user = endpoints.get_current_user()
-        # if not user:
-        #     raise endpoints.UnauthorizedException('Authorization required')
-        profile = None
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # get Profile from datastore
+        print "***********"
+        print user
+        logging.info('**1**** %s',user)
+        user_id = getUserId(user)
+        print "**********"
+        print user_id
+        logging.info('**2**** %s',user_id)
+        p_key = ndb.Key(Profile, user_id)
+        print "*********"
+        print p_key
+        logging.info('***3**** %s',p_key)
+        profile = p_key.get()
+        print "*********"
+        print profile
+        logging.info('****4**** %s',profile)
+
+
         ## step 2: create a new Profile from logged in user data
         ## you can use user.nickname() to get displayName
         ## and user.email() to get mainEmail
         if not profile:
             profile = Profile(
-                userId = None,
-                key = None,
-                displayName = "Test", 
-                mainEmail= None,
+                # userId = None,
+                key = p_key,
+                displayName = user.nickname, 
+                mainEmail= user.email,
                 teeShirtSize = str(TeeShirtSize.NOT_SPECIFIED),
             )
+            profile.put()
 
         return profile      # return Profile
 
@@ -98,6 +120,7 @@ class ConferenceApi(remote.Service):
                     val = getattr(save_request, field)
                     if val:
                         setattr(prof, field, str(val))
+            prof.put()
 
         # return ProfileForm
         return self._copyProfileToForm(prof)
@@ -112,11 +135,11 @@ class ConferenceApi(remote.Service):
     # TODO 1
     # 1. change request class
     # 2. pass request to _doProfile function
-    @endpoints.method(message_types.VoidMessage, ProfileForm,
+    @endpoints.method(ProfileMiniForm, ProfileForm,
             path='profile', http_method='POST', name='saveProfile')
     def saveProfile(self, request):
         """Update & return user profile."""
-        return self._doProfile()
+        return self._doProfile(request)
 
 
 # registers API

@@ -81,6 +81,8 @@ function greetByName () {
 	request.execute(sayHelloCallback);
 }
 
+
+
 // Process the JSON response
 // In this case, just show an alert dialog box
 // displaying the value of the message field in the response
