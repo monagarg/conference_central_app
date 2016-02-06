@@ -76,9 +76,51 @@ class ConferenceForm(messages.Message):
     websafeKey      = messages.StringField(11)
     organizerDisplayName = messages.StringField(12)
 
+class Session(ndb.Model):
+    """Session -- Session object"""
+    name            = ndb.StringProperty(required=True)
+    conferenceId    = ndb.StringProperty()
+    highlights      = ndb.StringProperty()
+    speaker         = ndb.StringProperty()
+    duration        = ndb.StringProperty()
+    typeOfSession   = ndb.StringProperty(repeated=True)
+    date            = ndb.DateProperty()
+    startTime       = ndb.TimeProperty()
+
+class SessionForm(messages.Message):
+    """SessionForm -- Session outbound form message"""
+    name            = messages.StringField(1)
+    conferenceId    = messages.StringField(2)
+    highlights      = messages.StringField(3)
+    speaker         = messages.StringField(4)
+    duration        = messages.StringField(5)
+    typeOfSession   = messages.StringField(6, repeated=True)
+    date            = messages.StringField(7) #DateTimeField()
+    startTime       = messages.StringField(8) #DateTimeField()
+    websafeKey      = messages.StringField(9)
+
+class WishList(ndb.Model):
+    """WishList -- Session object"""
+    userId          = ndb.StringProperty(required=True)
+    sessionId       = ndb.StringProperty(required=True)
+
+class WishListForm(messages.Message):
+    """WishListForm -- Session outbound form message"""
+    userId          = messages.StringField(1)
+    sessionId       = messages.StringField(2)
+    websafeKey      = messages.StringField(3)
+
 class ConferenceForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
     items = messages.MessageField(ConferenceForm, 1, repeated=True)
+
+class SessionForms(messages.Message):
+    """ConferenceForms -- multiple Conference outbound form message"""
+    items = messages.MessageField(SessionForm, 1, repeated=True)
+
+class WishListForms(messages.Message):
+    """ConferenceForms -- multiple Conference outbound form message"""
+    items = messages.MessageField(WishListForm, 1, repeated=True)
 
 class TeeShirtSize(messages.Enum):
     """TeeShirtSize -- t-shirt size enumeration value"""
