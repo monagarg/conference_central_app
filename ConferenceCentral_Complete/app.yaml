@@ -6,6 +6,7 @@ threadsafe: yes
 
 handlers:       # static then dynamic
 
+
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
@@ -30,10 +31,13 @@ handlers:       # static then dynamic
   upload: templates/index\.html
   secure: always
 
-- url: /tasks/send_confirmation_email
+- url: /tasks / send_confirmation_email  
   script: main.app
 
-- url: /crons/set_announcement
+- url: /crons / set_announcement
+  script: main.app
+
+- url: /tasks / get_featured_speaker
   script: main.app
 
 - url: /_ah/spi/.*
