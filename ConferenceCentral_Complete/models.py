@@ -29,6 +29,7 @@ class Profile(ndb.Model):
     mainEmail = ndb.StringProperty()
     teeShirtSize = ndb.StringProperty(default='NOT_SPECIFIED')
     conferenceKeysToAttend = ndb.StringProperty(repeated=True)
+    sessionKeysInWishList = ndb.StringProperty(repeated=True)
 
 
 class ProfileMiniForm(messages.Message):
@@ -43,6 +44,7 @@ class ProfileForm(messages.Message):
     mainEmail = messages.StringField(2)
     teeShirtSize = messages.EnumField('TeeShirtSize', 3)
     conferenceKeysToAttend = messages.StringField(4, repeated=True)
+    sessionKeysInWishList = messages.StringField(5, repeated=True)
 
 
 class StringMessage(messages.Message):
@@ -91,7 +93,7 @@ class Session(ndb.Model):
     conferenceId = ndb.StringProperty()
     highlights = ndb.StringProperty()
     speaker = ndb.StringProperty()
-    duration = ndb.StringProperty()
+    duration = ndb.IntegerProperty()
     typeOfSession = ndb.StringProperty(repeated=True)
     date = ndb.DateProperty()
     startTime = ndb.TimeProperty()
@@ -100,28 +102,14 @@ class Session(ndb.Model):
 class SessionForm(messages.Message):
     """SessionForm -- Session outbound form message"""
     name = messages.StringField(1)
-    # conferenceId    = messages.StringField(2)
     highlights = messages.StringField(2)
     speaker = messages.StringField(3)
-    duration = messages.StringField(4)
+    duration = messages.IntegerField(4)
     typeOfSession = messages.StringField(5, repeated=True)
     date = messages.StringField(6)  # DateTimeField()
     startTime = messages.StringField(7)  # DateTimeField()
     confWebsafeKey = messages.StringField(8)
     websafeKey = messages.StringField(9)
-
-
-class WishList(ndb.Model):
-    """WishList -- Session object"""
-    userId = ndb.StringProperty(required=True)
-    sessionId = ndb.StringProperty(required=True)
-
-
-class WishListForm(messages.Message):
-    """WishListForm -- Session outbound form message"""
-    userId = messages.StringField(1)
-    sessionId = messages.StringField(2)
-    websafeKey = messages.StringField(3)
 
 
 class ConferenceForms(messages.Message):
@@ -132,11 +120,6 @@ class ConferenceForms(messages.Message):
 class SessionForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
-
-
-class WishListForms(messages.Message):
-    """ConferenceForms -- multiple Conference outbound form message"""
-    items = messages.MessageField(WishListForm, 1, repeated=True)
 
 
 class TeeShirtSize(messages.Enum):
