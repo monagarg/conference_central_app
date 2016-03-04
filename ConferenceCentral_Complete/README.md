@@ -12,23 +12,27 @@ App Engine application for the Udacity training course.
 
 ## Design Choices
 1. Task 1: Add Sessions to a Conference
-	Created a Session class with the following parameters: name, conferenceId, highlights, speaker, duration, typeOfSpeaker, date and startTime. The conferenceId parameter contains the webSafeKey for the conference to which the session belongs.
+	Created a Session class with the following parameters: name, conferenceId, highlights, speaker, duration, typeOfSpeaker, date and startTime. As there is a speaker associated with every session, speaker is added as one of the Session parameters. If in future, there are multiple speakers associated with a session, then this can be extended to a list. Also, if in future, a speaker is associated with multiple sessions, then a Speaker class can be created to avoid storing the same speaker with different sessions.
 
 	getConferenceSessions: implemented a query of Session kind that compares the given conference with the conferenceId and returns all the sessions.
 
-	getConferenceSessionsByType: implemented a query of Session kind that compares the given conference with the conferenceId and return all the Sessions associated with that conference. After that, created a filter that filters the sessions based on the Type provided by the user.
+	getConferenceSessionsByType: implemented a query of Session kind that compares the given conference and type, and it returns all the Sessions associated with that conference.
 
 	getSessionsBySpeaker: implemented a query of kind Session that compares the speaker property with the speaker provided by the user and returns all the sessions given by that speaker.
 
 2.  Task 2: Add Sessions to User Wishlist
-	Created a WishList class which contains userId (email id of the user) and sessionId (webSafeKey of the session).
+	Added a list (sessionKeysInWishList) of Session keys in the Profile class. This field stores the user's sessions wishlist. As user's profile already contains all the data associated with the user, I believe adding a new list and storing the wishlist sessions within the profile is the best place to manage this wishlist.
 
-	getSessionsInWishlist: created a query to obtain all the wishlists for the logged-in user using the ancestor query. And then created a query to obtain the session objects from the wishlists and returned all the sessions that the user is interested in.
 
 ## Task 3
 Two additional queries
-1. List all sessions which are scheduled on the given day
-2. List all sessions which are scheduled less than the given duration
+1. getSessionsByDay: list all sessions which are scheduled on the given day.
+2. getSessionsByDuration: list all sessions which are scheduled between the given minimum and maximum duration.
+
+## Task 4
+A user might only be able to attend the conference on a particular day and would like to see all the sessions scheduled on a particular day of the conference. getSessionsByDay query solves this problem and returns all the sessions scheduled on a particular day of the conference.
+
+A user is only interested in attending a few sessions which are scheduled for not more than 2 hours. getSessionsByDuration query will return the sessions which are scheduled between the given duration.
 
 
 ## Setup Instructions
