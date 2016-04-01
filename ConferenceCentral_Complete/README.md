@@ -29,6 +29,9 @@ Two additional queries
 1. getSessionsByDay: list all sessions which are scheduled on the given day.
 2. getSessionsByDuration: list all sessions which are scheduled between the given minimum and maximum duration.
 
+Query for all non-workshop sessions before 7 pm
+This query contains two inequality conditions (non-workshop and sessions before 7 PM). However, inequality filters are only allowed on one property. To solve this query, I created one inequality condition, and for the second inequality condition, I had to go over each session using a for loop and save the session which satisfies the other inequality condition.
+
 ## Task 4
 A user might only be able to attend the conference on a particular day and would like to see all the sessions scheduled on a particular day of the conference. getSessionsByDay query solves this problem and returns all the sessions scheduled on a particular day of the conference.
 

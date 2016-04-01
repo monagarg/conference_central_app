@@ -92,7 +92,7 @@ class Session(ndb.Model):
     name = ndb.StringProperty(required=True)
     conferenceId = ndb.StringProperty()
     highlights = ndb.StringProperty()
-    speaker = ndb.StringProperty()
+    speaker = ndb.StringProperty(required=True)
     duration = ndb.IntegerProperty()
     typeOfSession = ndb.StringProperty(repeated=True)
     date = ndb.DateProperty()

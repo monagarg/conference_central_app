@@ -150,7 +150,7 @@ class ConferenceApi(remote.Service):
 
         if not request.name:
             raise endpoints.BadRequestException(
-                "Conference 'name' field required")
+                "Session 'name' field required")
 
         # Get the existing conference
         conf_key = ndb.Key(urlsafe=request.confWebsafeKey)
@@ -164,7 +164,7 @@ class ConferenceApi(remote.Service):
         # Check that user is owner
         if user_id != conf.organizerUserId:
             raise endpoints.ForbiddenException(
-                'Only the owner can update the conference.')
+                'Only the owner can create a session.')
 
         # copy SessionForm/ProtoRPC Message into dict
         data = {field.name: getattr(request, field.name)
@@ -177,7 +177,7 @@ class ConferenceApi(remote.Service):
             data['date'] = datetime.strptime(
                 data['date'][:10], "%Y-%m-%d").date()
         else:
-            defaultDate = "1900-01-01"
+            defaultDate = 'None'
             data['date'] = datetime.strptime(
                 defaultDate, "%Y-%m-%d").date()
 
@@ -185,21 +185,6 @@ class ConferenceApi(remote.Service):
         if data['startTime']:
             data['startTime'] = datetime.strptime(
                 data['startTime'][:5], "%H:%M").time()
-
-        # set name to be same as name on creation
-        data['name'] = data['name']
-
-        # set highlights to be same as highlights on creation
-        data['highlights'] = data['highlights']
-
-        # set speaker to be same as speaker on creation
-        data['speaker'] = data['speaker']
-
-        # set duration to be same as duration on creation
-        data['duration'] = data['duration']
-
-        # set seatsAvailable to be same as maxAttendees on creation
-        data['typeOfSession'] = data['typeOfSession']
 
         # create a session id and key
         s_id = Session.allocate_ids(size=1, parent=conf_key)[0]
@@ -354,8 +339,11 @@ class ConferenceApi(remote.Service):
                 "This session is already added to your wishlist")
 
         # add session in the wishlist
-        prof.sessionKeysInWishList.append(wssk)
-        retval = True
+        if wssk not in prof.sessionKeysInWishList:
+            prof.sessionKeysInWishList.append(wssk)
+            retval = True
+        else:
+            retval = False
 
         # write things back to the datastore & return
         prof.put()
@@ -364,7 +352,7 @@ class ConferenceApi(remote.Service):
     @endpoints.method(WISHLIST_POST_REQUEST, BooleanMessage, path='wishlist',
                       http_method='POST', name='addSessionToWishlist')
     def addSessionToWishlist(self, request):
-        """Create new wishlist."""
+        """Add session to users wishlist."""
         return self._addSessionWishListObject(request)
 
     @endpoints.method(message_types.VoidMessage, SessionForms,
@@ -421,7 +409,6 @@ class ConferenceApi(remote.Service):
 
         sessions = Session.query(Session.conferenceId == websafeConferenceKey)
         sessions = sessions.filter(Session.speaker == speaker)
-        count = 0
 
         if sessions.count() > 1:
             # If the speaker has more than one session,
@@ -429,18 +416,12 @@ class ConferenceApi(remote.Service):
             featuredSpeaker = FEATURED_SPEAKERS_TPL % (speaker,
                                                        ', '.join(session.name for session in sessions))
             memcache.set(MEMCACHE_FEATURED_SPEAKER_KEY, featuredSpeaker)
-        else:
-            # If the speaker has only one session,
-            # delete the memcache speaker entry
-            featuredSpeaker = ""
-            memcache.delete(MEMCACHE_FEATURED_SPEAKER_KEY)
 
     @endpoints.method(message_types.VoidMessage, StringMessage,
                       path='session/featured/get',
                       http_method='GET', name='getFeaturedSpeaker')
     def getFeaturedSpeaker(self, request):
         """Return featured speaker from memcache."""
-        data = memcache.get(MEMCACHE_FEATURED_SPEAKER_KEY)
         return StringMessage(data=memcache.get(MEMCACHE_FEATURED_SPEAKER_KEY) or "")
 
 
